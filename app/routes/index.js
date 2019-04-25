@@ -7,6 +7,9 @@ var passport 	= require('passport');
 var User = require('../models/user');
 var Room = require('../models/room');
 
+const userRoutes = require('./user/user.route');
+const chatRoutes = require('./chat/chat.route');
+
 // Home page
 router.get('/', function(req, res, next) {
 	// If user is already logged in, then redirect to rooms page
@@ -93,7 +96,6 @@ router.get('/chat/:id', [User.isAuthenticated, function(req, res, next) {
 		}
 		res.render('chatroom', { user: req.user, room: room });
 	});
-	
 }]);
 
 // Logout
@@ -107,5 +109,7 @@ router.get('/logout', function(req, res, next) {
 	// redirect to homepage
 	res.redirect('/');
 });
+
+router.use('/conversation', chatRoutes);
 
 module.exports = router;
