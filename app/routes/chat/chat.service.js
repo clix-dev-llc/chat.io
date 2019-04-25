@@ -24,7 +24,6 @@ module.exports = {
 
   getConversation: async (currentUserId, userId) => {
     const userArray = [currentUserId, userId];
-
     const conversationId = generateChatConversationMembersHash(userArray);
     try {
     const query = {conversation_id : conversationId};
@@ -47,4 +46,19 @@ module.exports = {
       return new Error("NOT_FOUND");
     }
   },
+
+  addNewMessage: (conversationId, messageInfo) =>{
+    const message = new Message({
+      conversation_id: -2093582676,
+      from : 123456,
+      text : messageInfo.content,
+      timestamp: messageInfo.date,
+      status: 'SENT'
+    });
+
+    return message.save().then(messageModel =>{
+    return messageModel.toObject();
+    })
+    // console.log(messageModel.toObject());
+  }
 };
