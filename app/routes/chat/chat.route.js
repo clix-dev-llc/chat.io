@@ -1,7 +1,3 @@
-/*
- * Copyright © 2014-2017 Zuru Tech HK Limited and Archbox S.r.l., All rights reserved.
- */
-
 const express = require('express');
 const chatController = require('./chat.controller');
 

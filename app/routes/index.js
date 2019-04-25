@@ -111,5 +111,6 @@ router.get('/logout', function(req, res, next) {
 });
 
 router.use('/conversation', chatRoutes);
+router.use('/user', userRoutes);
 
 module.exports = router;
