@@ -12,9 +12,14 @@ module.exports = {
       next(error);
     }
   },
-  GetConversations: (request, response, next) => {
-    response.send(200);
-
+  GetConversations: async (request, response, next) => {
+    try{
+      const conversationList = await chatService.getConversationList(request.headers.uid);
+      response.send(conversationList).status(200);
+    }
+    catch(error){
+      next(error);
+    }
   },
   UpdateConversation: (request, response, next) => {
     response.send(409);
@@ -32,4 +37,15 @@ module.exports = {
       next(error);
     }
   },
+  GetConversationList: async (request, response, next) => {
+    const { uid }=  request.headers;
+
+    try {
+      const conversationDetail = await chatService.getConversationList(uid);
+      response.send(conversationDetail).status(200);
+    }
+    catch(error) {
+      next(error);
+    }
+  }
 };

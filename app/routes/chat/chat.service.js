@@ -48,17 +48,39 @@ module.exports = {
   },
 
   addNewMessage: (conversationId, messageInfo) =>{
+    const query = {'conversation_id': -2093582676 };
+    const updatedData = {'updated_at': new Date()};
     const message = new Message({
       conversation_id: -2093582676,
       from : 123456,
+      to : 234,
       text : messageInfo.content,
-      timestamp: messageInfo.date,
+      timestamp: new Date(),
       status: 'SENT'
     });
 
-    return message.save().then(messageModel =>{
-    return messageModel.toObject();
-    })
+    return message.save().then(messageModel => {
+       Conversation.findOneAndUpdate(query, updatedData, {upsert:true}).then(data => {
+        return messageModel.toObject();
+      });
+    });
     // console.log(messageModel.toObject());
-  }
+  },
+
+  getConversationList: async (currentUserId) => {
+    try {
+      const query = {members : currentUserId};
+      const conversationDetail =[];
+      const conversationModel = await Conversation.find(query, null, {sort: {updated_at: -1}});
+      conversationModel.forEach(conversation =>{
+        conversationDetail.push(conversation.toObject());
+
+      });
+      return conversationDetail;
+    }
+    catch(error) {
+      return new Error("NOT_FOUND");
+    }
+  },
+
 };

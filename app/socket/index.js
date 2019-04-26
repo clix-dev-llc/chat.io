@@ -87,10 +87,15 @@ const ioEvents = (io) => {
 
 		// When a new message arrives
 		socket.on('newMessage', function(conversationId, message) {
+          const requestId = message.request_id;
 
           chatService.addNewMessage(conversationId, message)
               .then(messageDetail => {
-                socket.broadcast.to(conversationId).emit('addMessage', message);
+                socket.broadcast.to(conversationId).emit('addMessage', messageDetail);
+                if(requestId) {
+                  messageDetail.request_id = request_id;
+                  socket.emit('messageCallback',messageDetail);
+                }
               }).catch(error => {
               console.log(error);
           })

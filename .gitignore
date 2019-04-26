@@ -3,3 +3,4 @@ node_modules
 .idea
 # Logs
 debug.log
+redis

@@ -16,6 +16,7 @@ const DEFAULT_USER_PICTURE = "/img/user.jpg";
  *
  */
 var UserSchema = new Mongoose.Schema({
+    username: { type: String, required: true },
     user_id: { type: Number,},
     status: { type: Boolean,},
     updated_at: { type: Date,},
