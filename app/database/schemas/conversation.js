@@ -3,7 +3,7 @@
 const Mongoose  = require('mongoose');
 
 /**
- * Each connection object represents a user connected through a unique event.
+ * Each connection object represents a user connected through a unique event2.
  * Each connection object composed of {userId + socketId}. Both of them together are unique.
  *
  */

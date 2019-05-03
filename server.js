@@ -10,7 +10,7 @@ const flash 		= require('connect-flash');
 // Chat application components
 const routes 		= require('./app/routes');
 const session 	= require('./app/session');
-const ioServer 	= require('./app/event')(app);
+const socketServer = require('./app/event');
 const logger 		= require('./app/logger');
 
 // Set the port number
@@ -43,4 +43,6 @@ app.use((err, request, response, next) => {
   response.status(errorResponse.httpStatusCode || 500).send(errorResponse.body);
 });
 
-ioServer.listen(port);
+module.exports = app;
+
+// socketServer.listen(app);
