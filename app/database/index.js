@@ -1,12 +1,12 @@
 'use strict';
 
-var config 		= require('../config');
-var Mongoose 	= require('mongoose');
-var logger 		= require('../logger');
+const config 		= require('../config');
+const Mongoose 	= require('mongoose');
+const logger 		= require('../logger');
 
 // Connect to the database
 // construct the database URI and encode username and password.
-var dbURI = "mongodb://" + 
+const dbURI = "mongodb://" + 
 			encodeURIComponent(config.db.username) + ":" + 
 			encodeURIComponent(config.db.password) + "@" + 
 			config.db.host + ":" + 
@@ -27,7 +27,6 @@ Mongoose.Promise = global.Promise;
 module.exports = { Mongoose, 
 	models: {
 		user: require('./schemas/user.js'),
-		room: require('./schemas/room.js'),
         conversation: require('./schemas/conversation.js'),
         message: require('./schemas/message.js'),
 	}
