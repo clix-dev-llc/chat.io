@@ -10,6 +10,7 @@ const SocketEventName = {
   NEW_MESSAGE:'NewMessage',
   RECEIVE_MESSAGE:'ReceiveMessage',
   MESSAGE_CALLBACK:'MessageCallback',
+  TYPING_INDICATOR:'TypingIndicator',
 };
 
 module.exports = {

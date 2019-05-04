@@ -44,6 +44,10 @@ const handleChatEvent = (io, socket, uid, next) => {
     }
   });
 
+  socket.on(SocketEventName.TYPING_INDICATOR, async (data) => {
+    data.user_id = uid;
+    socket.broadcast.emit(SocketEventName.TYPING_INDICATOR, data);
+  });
 };
 
 // socket.on(SocketEventName.ADD_PROJECT_COMMENT, async (data) => {
