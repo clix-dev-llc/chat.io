@@ -14,6 +14,7 @@ const ConversationSchema = new Mongoose.Schema({
   type: { type: String, required: true },
   created_at : {type: Date, required: true },
   updated_at : {type: Date, required: true },
+  latest_message : {type: Mongoose.Schema.Types.Mixed, required: true },
 });
 
 ConversationSchema.virtual('messages', {

@@ -1,6 +1,6 @@
-const upmEventService = require('./chat.event.service');
-const { getErrorResponse } = require('../utils/responseGenerator');
+const chatService = require('../routes/chat/chat.service');
 const userService = require('../routes/user/user.service');
+const { SocketEventName } = require('../utils/constant');
 
 // const handleSocketError = (socket, error, eventName) => {
 //   const errorResponse = getErrorResponse(error, null, null);
@@ -16,39 +16,32 @@ const userService = require('../routes/user/user.service');
 
 const handleChatEvent = (io, socket, uid, next) => {
 
-  socket.on('join', function(conversationId) {
-    socket.join(conversationId);
+  socket.on(SocketEventName.JOIN_CONVERSATION, (data) => {
+    socket.join(data.room_name);
   });
 
-  socket.on('disconnect', function() {
-
-    // update user status in database at the time of disconnection
+  socket.on(SocketEventName.DISCONNECT, () => {
     if(socket.handshake.query.uid) {
       userService.updateUserStatus(socket.handshake.query.uid, false);
-      io.of('/chatroom').emit('userStatus',{
+      io.emit(SocketEventName.USER_STATUS_UPDATE ,{
         userId : socket.handshake.query.uid,
         status : false,
         updatedAt: new Date().getTime()
       })
     }
-    if(socket.request.session.passport == null){
-      return;
-    }
   });
 
-  socket.on('newMessage', function(message) {
+  socket.on(SocketEventName.NEW_MESSAGE, async (message) => {
     const requestId = message.request_id;
-    const conversationId = message.conversationId;
-    chatService.addNewMessage(conversationId, message)
-        .then(messageDetail => {
-          socket.broadcast.to(conversationId).emit('addMessage', messageDetail);
-          if(requestId) {
-            messageDetail.request_id = request_id;
-            socket.emit('messageCallback',messageDetail);
-          }
-        }).catch(error => {
-      console.log(error);
-    })
+    const conversationId = message.conversation_id;
+    const messageDetail = await chatService.addNewMessage(conversationId, message);
+    const receiver = message.to;
+    const sender = message.from;
+    socket.broadcast.to(receiver).emit(SocketEventName.RECEIVE_MESSAGE, messageDetail);
+    if (requestId) {
+      messageDetail.request_id = requestId;
+      socket.emit(SocketEventName.MESSAGE_CALLBACK, messageDetail);
+    }
   });
 
 };
@@ -64,21 +57,24 @@ const handleChatEvent = (io, socket, uid, next) => {
 //   }
 // });
 
+const userConnected = (socket, io, next) => {
+  const userId = socket.handshake.query.uid;
+  if (userId) {
+    userService.updateUserStatus(socket.handshake.query.uid, true);
+    io.emit(SocketEventName.USER_STATUS_UPDATE, {
+      userId: socket.handshake.query.uid,
+      status: true,
+      updatedAt: new Date().getTime()
+    });
+    socket.username = userId;
+    socket.uid = userId;
+    next();
+  }
+};
+
 module.exports.InitUpmEvent = (io) => {
   io.use((socket, next) => {
-
-    const userId = socket.handshake.query.uid;
-    if(userId) {
-      userService.updateUserStatus(socket.handshake.query.uid, true);
-      io.emit('userStatus',{
-        userId : socket.handshake.query.uid,
-        status : true,
-        updatedAt: new Date().getTime()
-      });
-      socket.username = userId;
-      socket.uid = userId;
-      next();
-    }
+    userConnected(socket, io, next);
   });
 
   io.on('connection', (socket, next) => {

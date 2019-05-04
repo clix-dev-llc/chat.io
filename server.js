@@ -1,5 +1,7 @@
 'use strict';
 
+require('dotenv').config();
+
 // Chat application dependencies
 const express 	= require('express');
 const app  		= express();
@@ -13,8 +15,6 @@ const session 	= require('./app/session');
 const socketServer = require('./app/event');
 const logger 		= require('./app/logger');
 
-// Set the port number
-const port = process.env.PORT || 3000;
 const { getErrorResponse } = require('./app/utils/responseGenerator');
 
 // Middlewares
@@ -27,14 +27,9 @@ app.use(flash());
 
 app.use('/', routes);
 
-// Middleware to catch 404 errors
-app.use(function(req, res, next) {
-  res.status(404).sendFile(process.cwd() + '/app/views/404.htm');
-});
-
 // catch 404 and forward to error handler
 app.use((request, response, next) => {
-  response.status(404).send(getErrorResponse(new Error('NOT_FOUND')).body);
+  next(new Error('NOT_FOUND'));
 });
 
 // other type of errors, it *might* also be a Runtime Error
@@ -45,4 +40,3 @@ app.use((err, request, response, next) => {
 
 module.exports = app;
 
-// socketServer.listen(app);

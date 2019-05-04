@@ -12,7 +12,6 @@ module.exports = {
       const query = User.find({});
       query.select('user_id status updated_at');
       const userList = await query.exec();
-      if(userList.length === 0)  throw new Error('RESOURCE_NOT_FOUND');
       return userList;
     }
     catch(error){
@@ -25,7 +24,6 @@ module.exports = {
       const query = User.find({user_id: userId});
       query.select('user_id status updated_at');
       const userList = await query.exec();
-      if(userList.length === 0)  throw new Error('RESOURCE_NOT_FOUND');
       return userList[0];
     }
     catch(error){

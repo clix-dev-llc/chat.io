@@ -47,11 +47,10 @@ module.exports = {
     }
   },
 
-  addNewMessage: (conversationId, messageInfo) =>{
-    const query = {'conversation_id': -2093582676 };
-    const updatedData = {'updated_at': new Date()};
+  addNewMessage: async (conversationId, messageInfo) => {
+    const query = { 'conversation_id': conversationId };
     const message = new Message({
-      conversation_id: -2093582676,
+      conversation_id: conversationId,
       from : 123456,
       to : 234,
       text : messageInfo.content,
@@ -59,13 +58,11 @@ module.exports = {
       status: 'SENT'
     });
 
-    return message.save().then(messageModel => {
-       Conversation.findOneAndUpdate(query, updatedData, {upsert:true}).then(data => {
-        return messageModel.toObject();
-      });
-    });
-    // console.log(messageModel.toObject());
-  },
+    const messageModel = await message.save();
+    const updatedData = { 'updated_at': new Date(), 'latest_message': messageModel.toObject() };
+    await Conversation.findOneAndUpdate(query, updatedData, {upsert:true});
+    return messageModel.toObject();
+    },
 
   getConversationList: async (currentUserId) => {
     try {
@@ -74,7 +71,6 @@ module.exports = {
       const conversationModel = await Conversation.find(query, null, {sort: {updated_at: -1}});
       conversationModel.forEach(conversation =>{
         conversationDetail.push(conversation.toObject());
-
       });
       return conversationDetail;
     }
