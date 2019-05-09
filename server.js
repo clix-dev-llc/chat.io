@@ -14,8 +14,12 @@ const routes 		= require('./app/routes');
 const session 	= require('./app/session');
 const socketServer = require('./app/event');
 const logger 		= require('./app/logger');
+const cors = require('cors');
 
 const { getErrorResponse } = require('./app/utils/responseGenerator');
+
+// CORS package
+app.use(cors());
 
 // Middlewares
 app.use(bodyParser.json());

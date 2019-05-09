@@ -36,7 +36,7 @@ module.exports = {
         conversation_name : ''+userId
     };
     const conversationModel = await Conversation.findOneAndUpdate(query, conversationDetail, {'upsert':true,'new':true});
-    const messages = await Message.find(query);
+    const messages = await Message.find(query, null, {sort: {timestamp: -1}});
     delete conversationModel._id;
     delete conversationModel.__v;
     conversationModel.messages = messages;
@@ -51,8 +51,8 @@ module.exports = {
     const query = { 'conversation_id': conversationId };
     const message = new Message({
       conversation_id: conversationId,
-      from : 123456,
-      to : 234,
+      from : messageInfo.from,
+      to : messageInfo.to,
       text : messageInfo.content,
       timestamp: new Date(),
       status: 'SENT'
