@@ -36,8 +36,8 @@ const handleChatEvent = (io, socket, uid, next) => {
     const conversationId = message.conversation_id;
     const messageDetail = await chatService.addNewMessage(conversationId, message);
     const receiver = message.to;
-    const sender = message.from;
     socket.broadcast.to(receiver).emit(SocketEventName.RECEIVE_MESSAGE, messageDetail);
+    socket.broadcast.to(conversationId).emit(SocketEventName.RECEIVE_MESSAGE, messageDetail);
     if (requestId) {
       messageDetail.request_id = requestId;
       socket.emit(SocketEventName.MESSAGE_CALLBACK, messageDetail);
@@ -70,6 +70,7 @@ const userConnected = (socket, io, next) => {
       status: true,
       updatedAt: new Date().getTime()
     });
+    socket.join(userId);
     socket.username = userId;
     socket.uid = userId;
     next();
