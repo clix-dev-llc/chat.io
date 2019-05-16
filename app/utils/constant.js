@@ -4,7 +4,8 @@
 
 
 const SocketEventName = {
-  JOIN_CONVERSATION:'Join',
+  JOIN_CONVERSATION:'JoinConversation',
+  LEAVE_CONVERSATION:'LeaveConversation',
   DISCONNECT:'disconnect',
   USER_STATUS_UPDATE:'UserStatusUpdate',
   NEW_MESSAGE:'NewMessage',

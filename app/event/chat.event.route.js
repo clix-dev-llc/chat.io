@@ -17,14 +17,20 @@ const { SocketEventName } = require('../utils/constant');
 const handleChatEvent = (io, socket, uid, next) => {
 
   socket.on(SocketEventName.JOIN_CONVERSATION, (data) => {
-    socket.join(data.room_name);
+    socket.join(data.conversation_id);
+  });
+
+  socket.on(SocketEventName.LEAVE_CONVERSATION, (data) => {
+    socket.leave(data.conversation_id, null);
   });
 
   socket.on(SocketEventName.DISCONNECT, () => {
-    if(socket.handshake.query.uid) {
-      userService.updateUserStatus(socket.handshake.query.uid, false);
+    const userId = socket.handshake.query.uid;
+    if(userId) {
+      socket.leave(userId);
+      userService.updateUserStatus(userId, false);
       io.emit(SocketEventName.USER_STATUS_UPDATE ,{
-        userId : socket.handshake.query.uid,
+        userId : userId,
         status : false,
         updatedAt: new Date().getTime()
       })
@@ -34,7 +40,7 @@ const handleChatEvent = (io, socket, uid, next) => {
   socket.on(SocketEventName.NEW_MESSAGE, async (message) => {
     const requestId = message.request_id;
     const conversationId = message.conversation_id;
-    const messageDetail = await chatService.addNewMessage(conversationId, message);
+    const messageDetail = await chatService.addNewMessage(conversationId, message, uid);
     const receiver = message.to;
     socket.broadcast.to(receiver).emit(SocketEventName.RECEIVE_MESSAGE, messageDetail);
     socket.broadcast.to(conversationId).emit(SocketEventName.RECEIVE_MESSAGE, messageDetail);
@@ -46,7 +52,9 @@ const handleChatEvent = (io, socket, uid, next) => {
 
   socket.on(SocketEventName.TYPING_INDICATOR, async (data) => {
     data.user_id = uid;
-    socket.broadcast.emit(SocketEventName.TYPING_INDICATOR, data);
+    const conversationId = data.conversation_id;
+    // socket.broadcast.emit(SocketEventName.TYPING_INDICATOR, data);
+    socket.broadcast.to(conversationId).emit(SocketEventName.TYPING_INDICATOR, data);
   });
 };
 

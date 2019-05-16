@@ -47,11 +47,11 @@ module.exports = {
     }
   },
 
-  addNewMessage: async (conversationId, messageInfo) => {
+  addNewMessage: async (conversationId, messageInfo, uid) => {
     const query = { 'conversation_id': conversationId };
     const message = new Message({
       conversation_id: conversationId,
-      from : messageInfo.from,
+      from : uid,
       to : messageInfo.to,
       text : messageInfo.text,
       timestamp: new Date(),
